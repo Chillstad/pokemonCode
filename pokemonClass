@@ -1,0 +1,438 @@
+extends Node2D
+var realname = ""
+#every time you add a new monster, add its animation and stuff to startingstats
+var isStarter = false
+var isActive = false
+export var isenemy = false
+var hp = 0
+var stats = {
+	"health": 0,
+	"speed": 0,
+	"attack": 0,
+	"defense": 0,
+	"special attack": 0,
+	"special defense": 0,
+}
+
+var statweight = {
+	"health": 1,
+	"speed": 1,
+	"attack": 1,
+	"defense": 1,
+	"special attack": 1,
+	"special defense": 1,
+}
+
+var types = [] #physical, sensory, phlegm, choleric, melancholic
+
+var movelist = []
+
+var status = []
+
+var level = 5
+var xp = 0
+
+	
+
+func _ready():
+	setActive(false)
+	if realname != "":
+		name = realname
+	randomize()
+	$Sprite.animation = realname
+	startingstats()
+	
+	if !isActive:
+		visible = false
+	hp = stats["health"]
+
+func setActive(yesorno):
+	if yesorno:
+		isActive = true
+		visible = true
+	else:
+		isActive = false
+		visible = false
+
+func switchActive():
+	isActive = !isActive
+	if !isActive:
+		visible = false
+	else:
+		visible = true
+
+func roll(size):
+	return round(rand_range(1, size)) # rolls a size-sided dice
+
+func startingstats():
+	types = [] #physical, sensory, phlegm, choleric, melancholic
+
+	movelist = []
+
+	status = []
+	xp = 0
+	stats = {
+	"health": 0,
+	"speed": 0,
+	"attack": 0,
+	"defense": 0,
+	"special attack": 0,
+	"special defense": 0,
+}
+
+	statweight = {
+	"health": 1,
+	"speed": 1,
+	"attack": 1,
+	"defense": 1,
+	"special attack": 1,
+	"special defense": 1,
+}
+	match realname:
+		"Hanipi":
+			statweight["speed"] = 1.5
+			statweight["attack"] = 2
+			statweight["special defense"] = 0.75
+			types.append("physical")
+			types.append("sensory")
+			movelist += ["Slam", "Tickle", "Pluck", "Desperation"]
+		"Hireir":
+			statweight["attack"] = 1.25
+			statweight["special attack"] = 2.25
+			statweight["special defense"] = 0.75
+			statweight["health"] = 0.75
+			types.append("sensory")
+			movelist += ["Slam", "Supersonic", "Sonic Wave", "Heavy Metal"]
+		"Meetur":
+			statweight["speed"] = 2.25
+			statweight["attack"] = 1.75
+			statweight["special defense"] = 0.85
+			statweight["defense"] = 0.85
+			types.append("physical")
+			movelist += ["Bite", "Ready Up", "Speed Challenge", "Quick Rest"]
+		"Bokaco":
+			statweight["speed"] = 0.75
+			statweight["attack"] = 2
+			statweight["defense"] = 1.75
+			statweight["special defense"] = 0.6
+			statweight["health"] = 2
+			types.append("blood")
+			types.append("physical")
+			movelist += ["Bite", "Chomp", "Fortify", "Bleed Out"]
+		"Hieye":
+			statweight["speed"] = 1.75
+			statweight["special attack"] = 1.75
+			statweight["attack"] = 0.8
+			statweight["defense"] = 0.8
+			statweight["special defense"] = 1.25
+			statweight["health"] = 0.9
+			types.append("sensory")
+			movelist += ["Stare", "Intimidate", "Pluck", "Sonic Wave"]
+		"Tung":
+			statweight["speed"] = 0.75
+			statweight["special attack"] = 1.75
+			statweight["attack"] = 1
+			statweight["defense"] = 1.5
+			statweight["special defense"] = 0.6
+			statweight["health"] = 1.75
+			types.append("sensory")
+			types.append("blood")
+			movelist += ["Lick", "Pump", "Ready Up", "Bleed Out"]
+		"Sinose":
+			statweight["speed"] = 0.85
+			statweight["special attack"] = 1.75
+			statweight["attack"] = 0.6
+			statweight["defense"] = 1.75
+			statweight["special defense"] = 1.25
+			statweight["health"] = 0.75
+			types.append("phlegm")
+			types.append("sensory")
+			movelist += ["Sneeze", "Immune System", "Cough", "Fortify"]
+		"Wezer":
+			statweight["speed"] = 1.25
+			statweight["special attack"] = 2
+			statweight["attack"] = 1
+			statweight["defense"] = 0.9
+			statweight["special defense"] = 1.25
+			statweight["health"] = 1
+			types.append("phlegm")
+			types.append("blood")
+			movelist += ["Quick Rest", "Pump", "Cough", "Tickle"]
+		"Amalov":
+			statweight["speed"] = 1
+			statweight["special attack"] = 2
+			statweight["attack"] = 2
+			statweight["defense"] = 0.55
+			statweight["special defense"] = 0.75
+			statweight["health"] = 2
+			types.append("blood")
+			movelist += ["Immune System", "Pump", "Bleed Out", "Slam"]
+		"Peyyo":
+			statweight["speed"] = 3
+			statweight["special attack"] = 2
+			statweight["attack"] = 2
+			statweight["defense"] = 0.55
+			statweight["special defense"] = 1.25
+			statweight["health"] = 0.75
+			types.append("physical")
+			movelist += ["Tickle", "Speed Challenge", "Ready Up", "Heavy Metal"]
+		"Muscusar":
+			statweight["speed"] = 0.55
+			statweight["special attack"] = 1
+			statweight["attack"] = 3.5
+			statweight["defense"] = 0.6
+			statweight["special defense"] = 0.6
+			statweight["health"] = 1.25
+			types.append("physical")
+			types.append("phlegm")
+			movelist += ["Intimidate", "Pump", "Cough", "Slam"]
+		"Inteya":
+			statweight["speed"] = 1.5
+			statweight["special attack"] = 3.5
+			statweight["attack"] = 0.55
+			statweight["defense"] = 0.55
+			statweight["special defense"] = 1.75
+			statweight["health"] = 0.55
+			types.append("sensory")
+			movelist += ["Immune System", "Stare", "Heavy Metal", "Slam"]
+
+	for i in stats:
+		for n in 5:
+			stats[i] += roll(6) * statweight[i]
+	
+	
+func inflictStatus(target):
+	for i in target.status:
+		match i:
+			"poison":
+				target.hp -= roll(10)
+			"acid":
+				target.hp -= roll(target.stats["health"]/4)
+			"heal":
+				if target.stats["health"] > hp:
+					target.hp += roll(6) + roll(6) 
+		if rand_range(0, 1) > 0.83:
+			target.status.erase(i)
+			
+
+func movedef(move, target):
+
+  # basically massive switch statement, these attacks could be used, but I'm leaving them here for examples
+
+	match move:
+		"Cough":
+			attack(self, target, 0.95, 1.25, true, "phlegm")
+			if rand_range(0,1) > 0.83:
+				if target.status.has("poison"):
+					pass
+				else:
+					target.status.append("poison")
+		"Sneeze":
+			if target.status.has("poison"):
+				Player.textbox.text = target.realname + " is already sick!"
+			else:
+				target.status.append("poison")
+				Player.textbox.text = realname + " made their opponent sick!"
+		"Immune System":
+			if status.has("heal"):
+				Player.textbox.text = realname + " is already healthy!"
+			else:
+				status.append("heal")
+				Player.textbox.text = realname + " boosted their immune system!"
+		"Infectious Bile":
+			if target.status.has("heal"):
+				Player.textbox.text = target.realname + "'s immune system protected them!"
+			else:
+				target.status.append("acid")
+				attack(self, target, 1, 2.5, true, "melancholic")
+		"Bite":
+			attack(self, target, 0.99, 0.85, false, "physical")
+		"Slam":
+			attack(self, target, 0.90, 0.9, false, "physical")
+		"Tickle":
+			target.stats["defense"] -= roll(12)
+			target.stats["special defense"] -= roll(12)
+			Player.textbox.text = realname + " made their opponent vulnerable!"
+		"Intimidate":
+			target.stats["attack"] -= roll(12)
+			target.stats["special attack"] -= roll(12)
+			Player.textbox.text = realname + " weakened their opponent!"
+		"Pluck":
+			ds()
+			var steal = target.stats["health"] 
+			var stolen = roll(steal)/5
+			stolen = round(stolen)
+			target.hp  -= stolen
+			hp += stolen
+			Player.textbox.text = realname + " stole " + str(stolen) + " health!"
+		"Desperation":
+			attack(self, target, 0.5, 1.75, false, "physical")
+		"Sonic Wave":
+			attack(self, target, 0.9, 1.0, true, "sensory")
+		"Supersonic":
+			target.stats["speed"] -= roll(20)
+			Player.textbox.text = realname + " slowed their opponent!"
+		"Heavy Metal":
+			attack(self, target, 0.75, 1.25, true, "sensory")
+		"Ready Up":
+			stats["speed"] += roll(20) + 5
+			Player.textbox.text = realname + " got faster!"
+		"Speed Challenge":
+			if stats["speed"] > target.stats["speed"]:
+				attack(self, target, 0.95, 1.5, false, "physical")
+			else:
+				attack(self, target, 0.9, 0.9, false, "physical")
+		"Quick Rest":
+			var healAmount = round(roll(stats["health"])/2.5)
+			hp += healAmount
+			Player.textbox.text = realname + " took a rest and healed for " + str(healAmount) + "!"
+		"Chomp":
+			attack(self, target, 0.85, 1.75, false, "physical")
+		"Fortify":
+			stats["defense"] += roll(20)
+			stats["special defense"] += roll(20)
+			Player.textbox.text = realname + " braced for impact!"
+		"Bleed Out":
+			ds()
+			hp -= roll(10)
+			stats["attack"] += roll(30)
+			stats["health"] += roll(20)
+			stats["speed"] += roll(10)
+			Player.textbox.text = realname + " lost blood and gained adrenaline!"
+		"Stare":
+			target.stats["attack"] -= roll(20)
+			attack(self, target, 1, 0.7, true, "sensory")
+		"Lick":
+			attack(self, target, 0.95, 1.25, false, "physical")
+		"Pump":
+			target.stats["health"] -= roll(5)
+			attack(self, target, 0.95, 1.5, true, "blood")
+		"Gas Attack":
+			target.status.append("acid")
+			Player.textbox.text = realname + " gassed out their enemy!"
+		"Shit Bricks":
+			attack(self, target, 0.9, 1.25, false, "melancholic")
+		"Sticky Burst":
+			attack(self, target, 0.9, 1.25, true, "choleric")
+		"Grow":
+			stats["defense"] += roll(10)
+			stats["health"] += roll(10)
+			stats["special defense"] += roll(10)
+			Player.textbox.text = realname + " grew larger!"
+		"Vulnerable":
+			stats["defense"] -= roll(10)
+			stats["attack"] += roll(20)
+			stats["special attack"] += roll(20)
+			stats["special defense"] -= roll(10)
+			Player.textbox.text = realname + " sacrificed defense for attack!"
+		"Blood Splat":
+			attack(self, target, 0.8, 1.75, true, "blood")
+		
+func randomMod():
+	return rand_range(0.9, 1.1) # used to slightly randomize damage amount
+
+func attack(user, target, chance, power, isSpecial, type):
+	ds()
+	var damage = 0
+	var targetSD = target.stats["special defense"]
+	var targetD = target.stats["defense"]
+  
+	if targetD <= 0:
+		targetD = 0.0001
+	if targetSD <= 0:
+		targetSD = 0.0001
+   # ^ protects from weird division by 0
+    
+	if isSpecial:
+		if randf() < chance:
+			damage = sqrt(stats["special attack"]/targetSD) * power * level * randomMod()
+	else:
+		if randf() < chance:
+			damage = sqrt(stats["attack"]/targetD) * power * level * randomMod()
+	
+	damage *= effectiveness(type, target.types)
+	if is_nan(damage): # check to make sure number is actually a number
+		damage = 0
+	target.hp -= damage
+	Player.textbox.text = realname + " did " + str(round(damage)) + " damage!" # print damage
+
+func effectiveness(type, enemytypes):
+  # basically, takes the type of a used move, and the types of the enemy, and calculates damage #s.
+	var ratio = 1
+	match type:
+		"physical":
+			for i in enemytypes:
+				match i:
+					"physical":
+						ratio *= 1.5
+					"blood":
+						ratio *= 1.5
+					"phlegm":
+						ratio *= 1.5
+					"choleric":
+						ratio *= 1
+					"melancholic":
+						ratio *= 1
+					"sensory":
+						ratio *= 0.5
+		"sensory":
+			for i in enemytypes:
+				match i:
+					"physical":
+						ratio *= 1.5
+					"blood":
+						ratio *= 0.5
+					"phlegm":
+						ratio *= 0.5
+		"blood":
+			for i in enemytypes:
+				match i:
+					"physical":
+						ratio *= 1
+					"blood":
+						ratio *= 1.5
+					"phlegm":
+						ratio *= 1.5
+					"choleric":
+						ratio *= 0.5
+					"melancholic":
+						ratio *= 0.5
+					"sensory":
+						ratio *= 1.5
+		"phlegm":
+			for i in enemytypes:
+				match i:
+					"physical":
+						ratio *= 1.5
+					"blood":
+						ratio *= 0.5
+					"phlegm":
+						ratio *= 0.5
+					"choleric":
+						ratio *= 1.5
+					"melancholic":
+						ratio *= 1.5
+					"sensory":
+						ratio *= 1.5
+		"choleric":
+			for i in enemytypes:
+				match i:
+					"physical":
+						ratio *= 0.5
+					"choleric":
+						ratio *= 0.5
+					"melancholic":
+						ratio *= 1.5
+		"melancholic":
+			for i in enemytypes:
+				match i:
+					"physical":
+						ratio *= 0.5
+					"choleric":
+						ratio *= 1.5
+					"melancholic":
+						ratio *= 0.5
+	return ratio
+
+func ds():
+	Sound.p(Sound.hurt)
