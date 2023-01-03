@@ -1,0 +1,153 @@
+# this is what a comment looks like
+
+extends Node2D
+signal next
+signal answered
+signal finish
+var answer = null
+var playerActive
+var enemyActive
+var truePParty = []
+var trueEParty = []
+var pChosenMove = ""
+var eChosenMove = ""
+onready var L = $Panel/Label
+
+func _ready():
+	Player.canmove = false
+	Player.global_position = Vector2(80, 152)
+	Enemies.partyUpdate()
+	Player.partyUpdate()
+  
+	for i in range(0,4):
+		if Player.party[i].realname != "":
+			truePParty.append(Player.party[i])
+	for i in range(0,5):
+		if Enemies.party[i].realname != "":
+			trueEParty.append(Enemies.party[i])
+	
+	
+	
+	playerActive = truePParty[0]
+	enemyActive = trueEParty[0]
+	
+	
+	playerActive.switchActive()
+	enemyActive.switchActive()
+	updateHealth()
+	L.text = "An enemy " + enemyActive.realname + "!"
+	$playerName.text = playerActive.realname + ", " + str(playerActive.level)
+	$enemyName.text = enemyActive.realname + ", " + str(enemyActive.level)
+	updateMoves()
+	get_action()
+
+func enemySwitchCurrent(member):
+	enemyActive.switchActive()
+	enemyActive = trueEParty[member]
+	enemyActive.switchActive()
+	$enemyName.text = enemyActive.realname + ", " + str(enemyActive.level)
+	L.text = "They switched to " + enemyActive.realname + "!"
+	updateHealth()
+	
+
+func switchCurrent(member, finishAction):
+	playerActive.switchActive()
+	playerActive = truePParty[member]
+	playerActive.setActive(true)
+	$playerName.text = playerActive.realname + ", " + str(playerActive.level)
+	updateMoves()
+	L.text = "You switched to " + playerActive.realname + "!"
+	pChosenMove = ""
+	if finishAction:
+		actionConfirmed()
+	updateHealth()
+	
+func updateMoves():
+	$MoveOptions.move1 = playerActive.movelist[0]
+	$MoveOptions.move2 = playerActive.movelist[1]
+	$MoveOptions.move3 = playerActive.movelist[2]
+	$MoveOptions.move4 = playerActive.movelist[3]
+	$MoveOptions._ready()
+
+func get_action():
+	L.text = "What will you do?"
+	eChosenMove = enemyActive.movelist[round(rand_range(0,3))]
+
+func actionConfirmed():
+	turn(playerActive, enemyActive)
+	
+
+	
+func turn(user, enemy):
+	if user.stats["speed"] > enemy.stats["speed"]:
+		
+		if pChosenMove == "":
+			L.text = playerActive.realname + " can't make a move!"
+			enemy.movedef(eChosenMove, user)
+			playerText()
+			updateHealth()
+		else:
+			user.movedef(pChosenMove, enemy)
+			L.text = playerActive.realname + " used " + pChosenMove + "!"
+			playerText()
+			updateHealth()
+			if enemyActive.hp >= 0:
+				enemy.movedef(eChosenMove, user)
+				L.text = enemyActive.realname + " used " + eChosenMove + "!"
+				playerText()
+				updateHealth()
+	else:
+		if pChosenMove == "":
+			L.text = playerActive.realname + " can't make a move!"
+			enemy.movedef(eChosenMove, user)
+			playerText()
+			updateHealth()
+		else:
+			enemy.movedef(eChosenMove, user)
+			L.text = enemyActive.realname + " used " + eChosenMove + "!"
+			playerText()
+			updateHealth()
+			if playerActive.hp >= 0:
+				user.movedef(pChosenMove, enemy)
+				L.text = playerActive.realname + " used " + pChosenMove + "!"
+				playerText()
+				updateHealth()
+        
+	if playerActive.hp >= 0 and enemyActive.hp >= 0:
+		L.text = "Applying status effects..."
+		playerActive.inflictStatus(enemyActive)
+		enemyActive.inflictStatus(playerActive)
+		updateHealth()
+
+	
+	if enemyActive.hp <= 0:
+		enemyActive.death(playerActive)
+		trueEParty.erase(enemyActive)
+		if len(trueEParty) != 0:
+			L.text = "Uh oh! A new enemy!"
+			enemySwitchCurrent(round(rand_range(0, len(trueEParty)-1)))
+		else:
+			yield(self, "next")
+			L.text = "You won the battle!"
+			return #program should end here
+	if playerActive.hp <= 0:
+		playerActive.death(enemyActive)
+		truePParty.erase(playerActive)
+		if len(truePParty) != 0:
+			L.text = "Switching Karamon!"
+			switchCurrent(round(rand_range(0, len(truePParty)-1)), false)
+		else:
+			L.text = "You lost..."
+			return #program should end here
+	updateHealth()
+	get_action()
+
+
+
+func playerText():
+	L.text = Player.textbox.text #basically just outputs text, this function would be "printing"
+
+func updateHealth():
+	$playerHealth.rect_scale.x = playerActive.hp / playerActive.stats["health"]
+	$enemyHealth.rect_scale.x = enemyActive.hp / enemyActive.stats["health"]
+
